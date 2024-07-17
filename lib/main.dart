@@ -10,6 +10,7 @@ import 'dart:math';
 import 'package:intl/intl.dart';
 
 import 'package:speech_to_text/speech_to_text.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() async {
   // ignore: prefer_const_constructors
@@ -505,6 +506,16 @@ class _HomepageState extends State<Homepage> {
                 ]),
                 Card(
                     child: ListTile(
+                  title: const Text('Schaue nach Updates (Extern)'),
+                  subtitle: const Text(
+                      'Schau ob es eine neue Version der App gibt'),
+                  trailing: const Icon(Icons.open_in_new),
+                  onTap: () {
+                    _launchURL('https://github.com/OptixWolf/DailyApp/releases/latest');
+                  },
+                )),
+                Card(
+                    child: ListTile(
                   title: const Text('Dark Mode'),
                   subtitle: const Text(
                       'Wenn deaktiviert, benutzt die App das helle Design'),
@@ -539,6 +550,13 @@ class _HomepageState extends State<Homepage> {
         )
       ][currentPageIndex],
     );
+  }
+
+  _launchURL(String url) async {
+  final Uri finalUrl = Uri.parse(url);
+  if (!await launchUrl(finalUrl)) {
+    throw Exception('Could not launch $finalUrl');
+  }
   }
 
     Future<void> _showDateTimeDialog(BuildContext context, DateTime dateTime, List<String> liste, int index, String key) async {
