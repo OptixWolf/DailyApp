@@ -226,8 +226,6 @@ class _HomepageState extends State<Homepage> {
                                 ],
                               ),
                               child: ListTile(
-                                        contentPadding:
-                                            const EdgeInsets.only(left: 21),
                                         title: Text(
                                           listen.elementAt(index),
                                           style: const TextStyle(fontSize: 14),
@@ -739,8 +737,6 @@ class _ListPageState extends State<ListPage> {
                                 ],
                               ),
                               child: ListTile(
-                                        contentPadding:
-                                            const EdgeInsets.only(left: 21),
                                         title: Text(
                                           liste.elementAt(index),
                                           style: const TextStyle(fontSize: 14),
