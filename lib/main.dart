@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'dart:math';
@@ -102,6 +101,11 @@ class _HomepageState extends State<Homepage> {
     Preferences.getPref('darkmode').then((darkmodeValue) {
       setState(() {
         selectedDarkmodeValue = darkmodeValue;
+      });
+    });
+    Preferences.getPref('reorder').then((reorderValue) {
+      setState(() {
+        selectedReorderValue = reorderValue;
       });
     });
     Preferences.getPrefList('listen').then((lists) {
@@ -555,6 +559,8 @@ class _HomepageState extends State<Homepage> {
                     final newDateTime = DateTime.parse(textFieldController.text);
                     liste[index] = '$newDateTime|${liste[index].substring(liste[index].indexOf('|') + 1)}';
                     Preferences.setPrefList(key, liste);
+                  } catch (ex) {
+                    _showSnackbar(context, 'Ungültige Eingabe');
                   } finally {
                     Navigator.pop(context);
                   }
