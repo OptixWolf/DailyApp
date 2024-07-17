@@ -355,7 +355,7 @@ class _HomepageState extends State<Homepage> {
                             child: Slidable(
                               key: Key('$index'),
                               startActionPane: ActionPane(
-                                extentRatio: 0.6,
+                                extentRatio: 0.8,
                                 motion: const BehindMotion(),
                                 children: [
                                   SlidableAction(
@@ -377,6 +377,16 @@ class _HomepageState extends State<Homepage> {
                                       },
                                       backgroundColor: Colors.green,
                                       icon: Icons.timer,
+                                    ),
+                                    SlidableAction(
+                                      onPressed: (context) {
+                                        setState(() {
+                                          timeListen[index] = '${DateTime.now().toString()}|$thisName';
+                                          Preferences.setPrefList('times', timeListen);
+                                        });
+                                      },
+                                      backgroundColor: Colors.amber,
+                                      icon: Icons.restart_alt,
                                     ),
                                     SlidableAction(
                                       onPressed: (context) {
