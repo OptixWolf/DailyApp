@@ -180,10 +180,40 @@ class _HomepageState extends State<Homepage> {
           padding: const EdgeInsets.all(20.0),
           child: Column(
             children: [
-              const Row(
+              Row(
                 children: [
-                  SizedBox(width: 7),
-                  Text('Listen', style: TextStyle(fontSize: 50)),
+                  const SizedBox(width: 7),
+                  const Expanded(child: Text('Listen', style: TextStyle(fontSize: 50))),
+                  PopupMenuButton<int>(
+                                    onSelected: (value) {
+                                      if (value == 1) {
+                                        toggleSwitchReorder();
+                                      }
+                                      if (value == 2) {
+                                        _showDeleteDialog(context, -2, 'listen');
+                                      }
+                                    },
+                                    itemBuilder: (context) => [
+                                      const PopupMenuItem(
+                                        value: 1,
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.menu),
+                                            Text('Sortierindikatoren wechseln'),
+                                          ],
+                                        ),
+                                      ),
+                                      const PopupMenuItem(
+                                        value: 2,
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.delete),
+                                            Text('Alle Einträge löschen'),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                  ),
                 ],
               ),
               const SizedBox(height: 25),
@@ -214,7 +244,7 @@ class _HomepageState extends State<Homepage> {
                                     ),
                                     SlidableAction(
                                       onPressed: (context) {
-                                        _showDeleteDialog(context, index, listen, 'listen');
+                                        _showDeleteDialog(context, index, 'listen');
                                       },
                                       backgroundColor: Colors.red,
                                       icon: Icons.delete,
@@ -360,10 +390,40 @@ class _HomepageState extends State<Homepage> {
           padding: const EdgeInsets.all(20.0),
           child: Column(
             children: [
-              const Row(
+              Row(
                 children: [
-                  SizedBox(width: 7),
-                  Text('Zeitzähler', style: TextStyle(fontSize: 50)),
+                  const SizedBox(width: 7),
+                  const Expanded(child: Text('Zeitzähler', style: TextStyle(fontSize: 50))),
+                                    PopupMenuButton<int>(
+                                    onSelected: (value) {
+                                      if (value == 1) {
+                                        toggleSwitchReorder();
+                                      }
+                                      if (value == 2) {
+                                        _showDeleteDialog(context, -2, 'times');
+                                      }
+                                    },
+                                    itemBuilder: (context) => [
+                                      const PopupMenuItem(
+                                        value: 1,
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.menu),
+                                            Text('Sortierindikatoren wechseln'),
+                                          ],
+                                        ),
+                                      ),
+                                      const PopupMenuItem(
+                                        value: 2,
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.delete),
+                                            Text('Alle Einträge löschen'),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                  ),
                 ],
               ),
               const SizedBox(height: 25),
@@ -407,14 +467,14 @@ class _HomepageState extends State<Homepage> {
                                     ),
                                     SlidableAction(
                                       onPressed: (context) {
-                                        _showResetConfirmationDialog(context, index, timeListen, 'times', thisName);
+                                        _showResetConfirmationDialog(context, index, 'times', thisName);
                                       },
                                       backgroundColor: Colors.amber,
                                       icon: Icons.restart_alt,
                                     ),
                                     SlidableAction(
                                       onPressed: (context) {
-                                        _showDeleteDialog(context, index, timeListen, 'times');
+                                        _showDeleteDialog(context, index, 'times');
                                       },
                                       backgroundColor: Colors.red,
                                       icon: Icons.delete,
@@ -571,21 +631,6 @@ class _HomepageState extends State<Homepage> {
                     toggleSwitchDarkmode();
                   },
                 )),
-                Card(
-                    child: ListTile(
-                  title: const Text('Erlaube Listensortierung'),
-                  subtitle: const Text(
-                      'Wenn aktiviert, kann man die Listen neu anordnen'),
-                  trailing: Switch(
-                    value: selectedReorderValue,
-                    onChanged: (value) {
-                      toggleSwitchReorder();
-                    },
-                  ),
-                  onTap: () {
-                    toggleSwitchReorder();
-                  },
-                ))
               ],
             ),
           ),
@@ -601,7 +646,7 @@ class _HomepageState extends State<Homepage> {
   }
   }
 
-    Future<void> _showDeleteDialog(BuildContext context, int index, List<String> list, String key) async {
+    Future<void> _showDeleteDialog(BuildContext context, int index, String key) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -620,18 +665,45 @@ class _HomepageState extends State<Homepage> {
               onPressed: () {
                 if(key == 'listen')
                 {
-                  setState(() {
-                    Preferences.remPref('liste-${list.elementAt(index)}');
-                    list.removeAt(index);
-                    Preferences.setPrefList(key, list);
+                  if(index == -2)
+                  {
+                    setState(() {
+                      for(int i = 0; i <= listen.length - 1; i++)
+                      {
+                        Preferences.remPref('liste-${listen[i]}');
+                      }
+                      Preferences.remPref(key);
+                      listen.clear();
                   });
+                  }
+                  else
+                  {
+                  setState(() {
+                    Preferences.remPref('liste-${listen.elementAt(index)}');
+                    listen.removeAt(index);
+                    Preferences.setPrefList(key, listen);
+                  });
+                  }
                 }
-                else
+                else  if (key == 'times')
                 {
+                  if(index == -2)
+                  {
+                    setState(() {
+                      Preferences.remPref(key);
+                      timeListen.clear();
+                    });
+                  }
+                  else
+                  {
                   setState(() {
-                    list.removeAt(index);
-                    Preferences.setPrefList(key, list);
+                    timeListen.removeAt(index);
+                    Preferences.setPrefList(key, timeListen);
                   });
+                  }
+                }
+                else {
+                  _showSnackbar(context, 'How did we get here?');
                 }
                 Navigator.pop(context);
               },
@@ -643,7 +715,7 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
-      Future<void> _showResetConfirmationDialog(BuildContext context, int index, List<String> list, String key, String thisName) async {
+      Future<void> _showResetConfirmationDialog(BuildContext context, int index, String key, String thisName) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -802,6 +874,13 @@ class _ListPageState extends State<ListPage> {
     }
   }
 
+  void toggleSwitchReorder() {
+    setState(() {
+      selectedReorderValue = !selectedReorderValue;
+      Preferences.setPref('reorder', selectedReorderValue);
+    });
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
@@ -812,7 +891,37 @@ class _ListPageState extends State<ListPage> {
               Row(
                 children: [
                   const SizedBox(width: 7),
-                  Text(widget.listenname, style: const TextStyle(fontSize: 50)),
+                  Expanded(child: Text(widget.listenname, style: const TextStyle(fontSize: 50))),
+                  PopupMenuButton<int>(
+                                    onSelected: (value) {
+                                      if (value == 1) {
+                                        toggleSwitchReorder();
+                                      }
+                                      if (value == 2) {
+                                        _showDeleteDialog(context, -2, 'liste-${widget.listenname}');
+                                      }
+                                    },
+                                    itemBuilder: (context) => [
+                                      const PopupMenuItem(
+                                        value: 1,
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.menu),
+                                            Text('Sortierindikatoren wechseln'),
+                                          ],
+                                        ),
+                                      ),
+                                      const PopupMenuItem(
+                                        value: 2,
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.delete),
+                                            Text('Alle Einträge löschen'),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                  ),
                 ],
               ),
               const SizedBox(height: 25),
@@ -843,7 +952,7 @@ class _ListPageState extends State<ListPage> {
                                     ),
                                     SlidableAction(
                                       onPressed: (context) {
-                                        _showDeleteDialog(context, index, liste, 'liste-${widget.listenname}');
+                                        _showDeleteDialog(context, index, 'liste-${widget.listenname}');
                                       },
                                       backgroundColor: Colors.red,
                                       icon: Icons.delete,
@@ -962,7 +1071,7 @@ class _ListPageState extends State<ListPage> {
     );
   }
 
-      Future<void> _showDeleteDialog(BuildContext context, int index, List<String> list, String key) async {
+      Future<void> _showDeleteDialog(BuildContext context, int index, String key) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -979,19 +1088,18 @@ class _ListPageState extends State<ListPage> {
             ),
             TextButton(
               onPressed: () {
-                if(key == 'listen')
+                if(index == -2)
                 {
                   setState(() {
-                    Preferences.remPref('liste-${list.elementAt(index)}');
-                    list.removeAt(index);
-                    Preferences.setPrefList(key, list);
+                    liste.clear();
+                    Preferences.setPrefList(key, liste);
                   });
                 }
                 else
                 {
                   setState(() {
-                    list.removeAt(index);
-                    Preferences.setPrefList(key, list);
+                    liste.removeAt(index);
+                    Preferences.setPrefList(key, liste);
                   });
                 }
                 Navigator.pop(context);
