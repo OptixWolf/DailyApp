@@ -407,10 +407,7 @@ class _HomepageState extends State<Homepage> {
                                     ),
                                     SlidableAction(
                                       onPressed: (context) {
-                                        setState(() {
-                                          timeListen[index] = '${DateTime.now().toString()}|$thisName';
-                                          Preferences.setPrefList('times', timeListen);
-                                        });
+                                        _showResetConfirmationDialog(context, index, timeListen, 'times', thisName);
                                       },
                                       backgroundColor: Colors.amber,
                                       icon: Icons.restart_alt,
@@ -636,6 +633,37 @@ class _HomepageState extends State<Homepage> {
                     Preferences.setPrefList(key, list);
                   });
                 }
+                Navigator.pop(context);
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+      Future<void> _showResetConfirmationDialog(BuildContext context, int index, List<String> list, String key, String thisName) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Bestätige',
+              style: TextStyle(fontSize: 20)),
+          content: const Text('Möchtest du das wirklich zurücksetzen?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Abbrechen'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  timeListen[index] = '${DateTime.now().toString()}|$thisName';
+                  Preferences.setPrefList('times', timeListen);
+                });
                 Navigator.pop(context);
               },
               child: const Text('OK'),
