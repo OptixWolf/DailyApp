@@ -214,11 +214,7 @@ class _HomepageState extends State<Homepage> {
                                     ),
                                     SlidableAction(
                                       onPressed: (context) {
-                                        setState(() {
-                                          Preferences.remPref('liste-${listen.elementAt(index)}');
-                                          listen.removeAt(index);
-                                          Preferences.setPrefList('listen', listen);
-                                        });
+                                        _showDeleteDialog(context, index, listen, 'listen');
                                       },
                                       backgroundColor: Colors.red,
                                       icon: Icons.delete,
@@ -389,10 +385,7 @@ class _HomepageState extends State<Homepage> {
                                     ),
                                     SlidableAction(
                                       onPressed: (context) {
-                                        setState(() {
-                                          timeListen.removeAt(index);
-                                          Preferences.setPrefList('times', timeListen);
-                                        });
+                                        _showDeleteDialog(context, index, timeListen, 'times');
                                       },
                                       backgroundColor: Colors.red,
                                       icon: Icons.delete,
@@ -555,6 +548,48 @@ class _HomepageState extends State<Homepage> {
   if (!await launchUrl(finalUrl)) {
     throw Exception('Could not launch $finalUrl');
   }
+  }
+
+    Future<void> _showDeleteDialog(BuildContext context, int index, List<String> list, String key) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Bestätige',
+              style: TextStyle(fontSize: 20)),
+          content: const Text('Möchtest du das wirklich löschen?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Abbrechen'),
+            ),
+            TextButton(
+              onPressed: () {
+                if(key == 'listen')
+                {
+                  setState(() {
+                    Preferences.remPref('liste-${list.elementAt(index)}');
+                    list.removeAt(index);
+                    Preferences.setPrefList(key, list);
+                  });
+                }
+                else
+                {
+                  setState(() {
+                    list.removeAt(index);
+                    Preferences.setPrefList(key, list);
+                  });
+                }
+                Navigator.pop(context);
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
     Future<void> _showDateTimeDialog(BuildContext context, DateTime dateTime, List<String> liste, int index, String key) async {
@@ -726,10 +761,7 @@ class _ListPageState extends State<ListPage> {
                                     ),
                                     SlidableAction(
                                       onPressed: (context) {
-                                        setState(() {
-                                          liste.removeAt(index);
-                                          Preferences.setPrefList('liste-${widget.listenname}', liste);
-                                        });
+                                        _showDeleteDialog(context, index, liste, 'liste-${widget.listenname}');
                                       },
                                       backgroundColor: Colors.red,
                                       icon: Icons.delete,
@@ -822,6 +854,48 @@ class _ListPageState extends State<ListPage> {
               )
     ])
     )
+    );
+  }
+
+      Future<void> _showDeleteDialog(BuildContext context, int index, List<String> list, String key) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Bestätige',
+              style: TextStyle(fontSize: 20)),
+          content: const Text('Möchtest du das wirklich löschen?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Abbrechen'),
+            ),
+            TextButton(
+              onPressed: () {
+                if(key == 'listen')
+                {
+                  setState(() {
+                    Preferences.remPref('liste-${list.elementAt(index)}');
+                    list.removeAt(index);
+                    Preferences.setPrefList(key, list);
+                  });
+                }
+                else
+                {
+                  setState(() {
+                    list.removeAt(index);
+                    Preferences.setPrefList(key, list);
+                  });
+                }
+                Navigator.pop(context);
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
