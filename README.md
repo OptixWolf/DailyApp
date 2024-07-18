@@ -1,6 +1,6 @@
 # DailyApp
 
-[![version](https://img.shields.io/badge/version-1.1.3-blue)](https://github.com/OptixWolf/DailyApp/releases/latest)
+[![version](https://img.shields.io/badge/version-1.1.4-blue)](https://github.com/OptixWolf/DailyApp/releases/latest)
 [![](https://img.shields.io/github/downloads/OptixWolf/DailyApp/total)](https://github.com/OptixWolf/DailyApp/releases/latest)
 [![](https://img.shields.io/discord/1107109693165416588?logo=discord)](https://discord.com/invite/KW7GWQfKaj)
 

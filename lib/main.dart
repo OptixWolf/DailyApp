@@ -263,6 +263,38 @@ class _HomepageState extends State<Homepage> {
                   child: Row(
                     children: [
                       Flexible(child: TextField(
+                        textInputAction: TextInputAction.go,
+                        onSubmitted: (value) {
+                        if(textEditingController.text.isNotEmpty)
+                        {
+                          if(editIndex == -1)
+                          {
+                          setState(() {
+                            if(!listen.contains(textEditingController.text))
+                            {
+                              listen.add(textEditingController.text);
+                              textEditingController.text = '';
+                              Preferences.setPrefList('listen', listen);
+                              Preferences.setPrefList('liste-${textEditingController.text}', []);
+                            } else {
+                              _showSnackbar(context, 'Name darf nicht doppelt vorkommen!');
+                            }
+                          });
+                          } else {
+                            setState(() {
+                              Preferences.getPrefList('liste-${listen.elementAt(editIndex)}').then((listContent) {
+                                Preferences.remPref('liste-${listen.elementAt(editIndex)}');
+                                listen[editIndex] = textEditingController.text;
+                                Preferences.setPrefList('listen', listen);
+                                Preferences.setPrefList('liste-${listen.elementAt(editIndex)}', listContent);
+                                textEditingController.text = '';
+                                editIndex = -1;
+                            });
+                          });
+                        }} else {
+                          _showSnackbar(context, 'Feld darf nicht leer sein!');
+                        } 
+                        },
                         controller: textEditingController,
                         decoration: InputDecoration(
                           hintText: editIndex == -1 ? 'Einkaufsliste' : 'Neuer Text zum bearbeiten',
@@ -427,6 +459,28 @@ class _HomepageState extends State<Homepage> {
                   child: Row(
                     children: [
                       Flexible(child: TextField(
+                        textInputAction: TextInputAction.go,
+                        onSubmitted: (value) {
+                        if(textEditingController.text.isNotEmpty)
+                        {
+                          if(editIndex2 == -1)
+                          {
+                          setState(() {
+                              timeListen.add('${DateTime.now()}|${textEditingController.text}');
+                              textEditingController.text = '';
+                              Preferences.setPrefList('times', timeListen);
+                          });
+                          } else {
+                            setState(() {
+                                timeListen[editIndex2] = '${timeListen.elementAt(editIndex2).substring(0, timeListen.elementAt(editIndex2).indexOf('|'))}|${textEditingController.text}';
+                                Preferences.setPrefList('times', timeListen);
+                                textEditingController.text = '';
+                                editIndex2 = -1;
+                          });
+                        }} else {
+                          _showSnackbar(context, 'Feld darf nicht leer sein!');
+                        }
+                        },
                         controller: textEditingController,
                         decoration: InputDecoration(
                           hintText: editIndex2 == -1 ? 'Name' : 'Neuer Text zum bearbeiten',
@@ -806,6 +860,29 @@ class _ListPageState extends State<ListPage> {
                   child: Row(
                     children: [
                       Flexible(child: TextField(
+                        textInputAction: TextInputAction.go,
+                        onSubmitted: (value) {
+                        if(textEditingController.text.isNotEmpty)
+                        {
+                          if(editIndex == -1)
+                          {
+                          setState(() {
+                              liste.add(textEditingController.text);
+                              textEditingController.text = '';
+                              Preferences.setPrefList('liste-${widget.listenname}', liste);
+                          });
+                          } else {
+                            setState(() {
+                              liste[editIndex] = textEditingController.text;
+                              Preferences.setPrefList('liste-${widget.listenname}', liste);
+                              textEditingController.text = '';
+                              editIndex = -1;
+                            });
+                          }
+                        } else {
+                          _showSnackbar(context, 'Feld darf nicht leer sein!');
+                        }
+                        },
                         controller: textEditingController,
                         decoration: InputDecoration(
                           hintText: editIndex == -1 ? 'Füge etwas hinzu...' : 'Neuer Text zum bearbeiten',
