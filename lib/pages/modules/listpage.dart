@@ -1,97 +1,49 @@
 import 'dart:async';
 import 'package:DailyApp/generated/l10n/app_localizations.dart';
+import 'package:DailyApp/pages/modules/listpage_entries.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:speech_to_text/speech_to_text.dart';
-
-import '../utils/preferences.dart';
-import '../utils/snackbar.dart';
+import '../../utils/preferences.dart';
+import '../../utils/snackbar.dart';
 
 class ListPage extends StatefulWidget {
-  final String listenname;
-
-  const ListPage({super.key, required this.listenname});
+  const ListPage({super.key});
 
   @override
   State<ListPage> createState() => _ListPageState();
 }
 
 class _ListPageState extends State<ListPage> {
-  List<String> liste = [];
+  List<String> listen = [];
   TextEditingController textEditingController = TextEditingController();
   int editIndex = -1;
+
+  bool selectedAskListDeletionValue = true;
   bool selectedReorderValue = true;
-  bool listEntryDeletionValue = true;
 
   @override
   void initState() {
     super.initState();
-    editIndex = -1;
-    speechToText = SpeechToText();
-    Preferences.getPrefList('liste-${widget.listenname}').then((listeninhalt) {
+        Preferences.getPrefBool('reorder').then((reorderValue) {
       setState(() {
-        liste = listeninhalt;
+        selectedReorderValue = reorderValue;
       });
     });
-    Preferences.getPrefBool('reorder').then((value) {
+    Preferences.getPrefList('listen').then((lists) {
       setState(() {
-        selectedReorderValue = value;
+        listen = lists;
       });
     });
-    Preferences.getPrefBool('list-entry-deletion').then((value) {
+        Preferences.getPrefBool('list-deletion').then((listDeletionValue) {
       setState(() {
-        listEntryDeletionValue = value;
+        selectedAskListDeletionValue = listDeletionValue;
       });
     });
   }
 
-  Future<void> _startListening() async {
-    final localizations = AppLocalizations.of(context)!;
-    if (!speechToText.isListening) {
-      bool available = await speechToText.initialize(
-        onStatus: (status) {
-          if (status == 'listening') {
-            _showListeningDialog(context);
-          }
-        },
-        onError: (errorNotification) {
-          if (dialogOpen) {
-            dialogOpen = false;
-            Navigator.pop(context);
-          }
-        },
-      );
-
-      if (available) {
-        speechToText.listen(
-          onResult: (result) {
-            if (result.finalResult) {
-              if (result.recognizedWords != "") {
-                List<String> newItems = result.recognizedWords.split(localizations.sTTSeperateWord);
-
-                for (int i = 0; i < newItems.length; i++) {
-                  setState(() {
-                    liste.add(newItems[i]);
-                  });
-                }
-                Preferences.setPrefList('liste-${widget.listenname}', liste);
-              }
-              if (dialogOpen) {
-                dialogOpen = false;
-                Navigator.pop(context);
-              }
-            }
-          },
-        );
-      }
-    } else {
-      speechToText.stop();
-      if (dialogOpen) {
-        dialogOpen = false;
-        Navigator.pop(context);
-      }
-    }
-  }
+  @override
+  Widget build(BuildContext context) {
+  final localizations = AppLocalizations.of(context)!;
 
   void toggleSwitchReorder() {
     setState(() {
@@ -100,28 +52,25 @@ class _ListPageState extends State<ListPage> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
-    return Scaffold(
-        appBar: AppBar(),
-        body: Padding(
+    return Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(children: [
               Row(
                 children: [
                   const SizedBox(width: 7),
                   Expanded(
-                      child: Text(widget.listenname,
-                          style: const TextStyle(fontSize: 50))),
+                      child: Text(localizations.categoryLists, style: const TextStyle(fontSize: 50))),
+                  /*FilledButton(
+                      onPressed: () => {},
+                      child: Text("Offline",
+                          style: TextStyle(fontWeight: FontWeight.bold))),*/
                   PopupMenuButton<int>(
                     onSelected: (value) {
                       if (value == 1) {
                         toggleSwitchReorder();
                       }
                       if (value == 2) {
-                        _showDeleteDialog(
-                            context, -2, 'liste-${widget.listenname}');
+                        _showDeleteDialog(context, -2, 'listen');
                       }
                     },
                     itemBuilder: (context) => [
@@ -148,10 +97,10 @@ class _ListPageState extends State<ListPage> {
                 ],
               ),
               const SizedBox(height: 25),
-              liste.isNotEmpty
+              listen.isNotEmpty
                   ? Expanded(
                       child: ReorderableListView.builder(
-                        itemCount: liste.length,
+                        itemCount: listen.length,
                         itemBuilder: (context, index) {
                           return Card(
                             key: Key('$index'),
@@ -166,7 +115,7 @@ class _ListPageState extends State<ListPage> {
                                       setState(() {
                                         editIndex = index;
                                         textEditingController.text =
-                                            liste.elementAt(index);
+                                            listen.elementAt(index);
                                       });
                                     },
                                     backgroundColor: Colors.blue,
@@ -177,8 +126,8 @@ class _ListPageState extends State<ListPage> {
                                   ),
                                   SlidableAction(
                                     onPressed: (context) {
-                                      _showDeleteDialog(context, index,
-                                          'liste-${widget.listenname}');
+                                      _showDeleteDialog(
+                                          context, index, 'listen');
                                     },
                                     backgroundColor: Colors.red,
                                     icon: Icons.delete,
@@ -187,7 +136,7 @@ class _ListPageState extends State<ListPage> {
                               ),
                               child: ListTile(
                                 title: Text(
-                                  liste.elementAt(index),
+                                  listen.elementAt(index),
                                   style: const TextStyle(fontSize: 14),
                                 ),
                                 trailing: Visibility(
@@ -196,6 +145,12 @@ class _ListPageState extends State<ListPage> {
                                       index: index,
                                       child: const Icon(Icons.menu)),
                                 ),
+                                onTap: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => ListPageEntries(
+                                          listenname:
+                                              listen.elementAt(index))));
+                                },
                               ),
                             ),
                           );
@@ -205,10 +160,9 @@ class _ListPageState extends State<ListPage> {
                             if (oldIndex < newIndex) {
                               newIndex -= 1;
                             }
-                            final String item = liste.removeAt(oldIndex);
-                            liste.insert(newIndex, item);
-                            Preferences.setPrefList(
-                                'liste-${widget.listenname}', liste);
+                            final String item = listen.removeAt(oldIndex);
+                            listen.insert(newIndex, item);
+                            Preferences.setPrefList('listen', listen);
                           });
                         },
                       ),
@@ -216,7 +170,7 @@ class _ListPageState extends State<ListPage> {
                   : Expanded(
                       child: Card(
                         child: ListTile(
-                          title: Text(localizations.generalNoEntriesFound),
+                          title: Text(localizations.listsNoListMessage),
                         ),
                       ),
                     ),
@@ -232,18 +186,34 @@ class _ListPageState extends State<ListPage> {
                           if (textEditingController.text.isNotEmpty) {
                             if (editIndex == -1) {
                               setState(() {
-                                liste.add(textEditingController.text);
-                                textEditingController.text = '';
-                                Preferences.setPrefList(
-                                    'liste-${widget.listenname}', liste);
+                                if (!listen
+                                    .contains(textEditingController.text)) {
+                                  listen.add(textEditingController.text);
+                                  textEditingController.text = '';
+                                  Preferences.setPrefList('listen', listen);
+                                  Preferences.setPrefList(
+                                      'liste-${textEditingController.text}',
+                                      []);
+                                } else {
+                                  Snackbar().show(context, localizations.listsNameMustNotBeDuplicate);
+                                }
                               });
                             } else {
                               setState(() {
-                                liste[editIndex] = textEditingController.text;
-                                Preferences.setPrefList(
-                                    'liste-${widget.listenname}', liste);
-                                textEditingController.text = '';
-                                editIndex = -1;
+                                Preferences.getPrefList(
+                                        'liste-${listen.elementAt(editIndex)}')
+                                    .then((listContent) {
+                                  Preferences.remPref(
+                                      'liste-${listen.elementAt(editIndex)}');
+                                  listen[editIndex] =
+                                      textEditingController.text;
+                                  Preferences.setPrefList('listen', listen);
+                                  Preferences.setPrefList(
+                                      'liste-${listen.elementAt(editIndex)}',
+                                      listContent);
+                                  textEditingController.text = '';
+                                  editIndex = -1;
+                                });
                               });
                             }
                           } else {
@@ -254,8 +224,8 @@ class _ListPageState extends State<ListPage> {
                         controller: textEditingController,
                         decoration: InputDecoration(
                           hintText: editIndex == -1
-                              ? localizations.listpageAddItem
-                              : localizations.listpageEditItem
+                              ? localizations.listsExampleName
+                              : localizations.listsEditFieldText,
                         ),
                       )),
                       const SizedBox(width: 10),
@@ -267,18 +237,34 @@ class _ListPageState extends State<ListPage> {
                             if (textEditingController.text.isNotEmpty) {
                               if (editIndex == -1) {
                                 setState(() {
-                                  liste.add(textEditingController.text);
-                                  textEditingController.text = '';
-                                  Preferences.setPrefList(
-                                      'liste-${widget.listenname}', liste);
+                                  if (!listen
+                                      .contains(textEditingController.text)) {
+                                    listen.add(textEditingController.text);
+                                    textEditingController.text = '';
+                                    Preferences.setPrefList('listen', listen);
+                                    Preferences.setPrefList(
+                                        'liste-${textEditingController.text}',
+                                        []);
+                                  } else {
+                                    Snackbar().show(context, localizations.listsNameMustNotBeDuplicate);
+                                  }
                                 });
                               } else {
                                 setState(() {
-                                  liste[editIndex] = textEditingController.text;
-                                  Preferences.setPrefList(
-                                      'liste-${widget.listenname}', liste);
-                                  textEditingController.text = '';
-                                  editIndex = -1;
+                                  Preferences.getPrefList(
+                                          'liste-${listen.elementAt(editIndex)}')
+                                      .then((listContent) {
+                                    Preferences.remPref(
+                                        'liste-${listen.elementAt(editIndex)}');
+                                    listen[editIndex] =
+                                        textEditingController.text;
+                                    Preferences.setPrefList('listen', listen);
+                                    Preferences.setPrefList(
+                                        'liste-${listen.elementAt(editIndex)}',
+                                        listContent);
+                                    textEditingController.text = '';
+                                    editIndex = -1;
+                                  });
                                 });
                               }
                             } else {
@@ -287,44 +273,35 @@ class _ListPageState extends State<ListPage> {
                             }
                           }),
                       const SizedBox(width: 10),
-                      IconButton(
-                          icon: editIndex == -1
-                              ? const Icon(Icons.mic)
-                              : const Icon(Icons.cancel),
-                          onPressed: () {
-                            if (editIndex == -1) {
-                              _startListening();
-                            } else {
-                              setState(() {
-                                editIndex = -1;
-                                textEditingController.text = '';
-                              });
-                            }
-                          }),
-                      const SizedBox(width: 10),
+                      Visibility(
+                        visible: editIndex != -1,
+                        child: Row(
+                          children: [
+                            IconButton(
+                                icon: const Icon(Icons.cancel),
+                                onPressed: () {
+                                  setState(() {
+                                    textEditingController.text = '';
+                                    editIndex = -1;
+                                  });
+                                }),
+                            const SizedBox(width: 10),
+                          ],
+                        ),
+                      )
                     ],
                   ),
                 ),
               )
-            ])));
+            ]));
   }
-
-  Future<void> _showDeleteDialog(
+    Future<void> _showDeleteDialog(
       BuildContext context, int index, String key) async {
-    if (!listEntryDeletionValue) {
-      if (index == -2) {
-        setState(() {
-          liste.clear();
-          Preferences.setPrefList(key, liste);
-        });
-      } else {
-        setState(() {
-          liste.removeAt(index);
-          Preferences.setPrefList(key, liste);
-        });
-      }
-    } else {
       final localizations = AppLocalizations.of(context)!;
+
+    if (key == 'listen' && !selectedAskListDeletionValue) {
+      deleteSpecificPrefData(context, index, key);
+    } else {
       return showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -340,17 +317,7 @@ class _ListPageState extends State<ListPage> {
               ),
               TextButton(
                 onPressed: () {
-                  if (index == -2) {
-                    setState(() {
-                      liste.clear();
-                      Preferences.setPrefList(key, liste);
-                    });
-                  } else {
-                    setState(() {
-                      liste.removeAt(index);
-                      Preferences.setPrefList(key, liste);
-                    });
-                  }
+                  deleteSpecificPrefData(context, index, key);
                   Navigator.pop(context);
                 },
                 child: Text(localizations.dialogOk),
@@ -362,33 +329,25 @@ class _ListPageState extends State<ListPage> {
     }
   }
 
-  bool dialogOpen = false;
-  late SpeechToText speechToText;
-
-  void _showListeningDialog(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
-    dialogOpen = true;
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(localizations.dialogSTTTitle,
-              style: TextStyle(fontSize: 20)),
-          content:
-              Text(localizations.dialogSTTSubtitle),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                speechToText.cancel();
-                dialogOpen = false;
-                Navigator.pop(context);
-              },
-              child: Text(localizations.dialogCancel),
-            ),
-          ],
-        );
-      },
-    );
+    void deleteSpecificPrefData(BuildContext context, int index, String key) {
+    if (key == 'listen') {
+      if (index == -2) {
+        setState(() {
+          for (int i = 0; i <= listen.length - 1; i++) {
+            Preferences.remPref('liste-${listen[i]}');
+          }
+          Preferences.remPref(key);
+          listen.clear();
+        });
+      } else {
+        setState(() {
+          Preferences.remPref('liste-${listen.elementAt(index)}');
+          listen.removeAt(index);
+          Preferences.setPrefList(key, listen);
+        });
+      }
+    } else {
+      Snackbar().show(context, 'How did we get here?');
+    }
   }
 }

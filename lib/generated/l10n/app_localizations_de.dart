@@ -63,7 +63,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsTitleGeneral => 'Allgemeine Einstellungen';
 
   @override
-  String get settingsRepoTitle => 'Source Code (Extern)';
+  String get settingsRepoTitle => 'Quellcode (Extern)';
 
   @override
   String get settingsRepoSubtitle =>

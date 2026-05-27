@@ -17,7 +17,7 @@
   "countersEditFieldText": "Neuer Name für Zähler",
   "counterRunningFor": "Am laufen seit: {days}d {hours}h {minutes}min {seconds}s",
   "settingsTitleGeneral": "Allgemeine Einstellungen",
-  "settingsRepoTitle": "Source Code (Extern)",
+  "settingsRepoTitle": "Quellcode (Extern)",
   "settingsRepoSubtitle": "Hier kommst du zum GitHub Repository vom Projekt",
   "settingsDarkmodeTitle": "Dunkler Modus",
   "settingsDarkmodeSubtitle": "Wenn aktiviert, benutzt die App das dunkle Design",
