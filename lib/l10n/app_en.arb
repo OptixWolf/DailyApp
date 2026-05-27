@@ -1,0 +1,68 @@
+{
+  "@@locale": "en",
+  "sTTSeperateWord": " and ",
+  "categoryLists": "Lists",
+  "categoryCounters": "Time Counters",
+  "categorySettings": "Settings",
+  "generalFabTitle": "Save",
+  "generalSwitchIndicators": "Change sorting indicators",
+  "generalDeleteAllEntries": "Delete all entries",
+  "generalFieldMustNotBeEmpty": "This field must not be empty!",
+  "generalNoEntriesFound": "No entries found",
+  "listsNoListMessage": "No lists available",
+  "listsExampleName": "Shopping list",
+  "listsEditFieldText": "New Name for list",
+  "listsNameMustNotBeDuplicate": "Name must not be duplicated!",
+  "countersExampleName": "Name",
+  "countersEditFieldText": "New Name for Counter",
+  "counterRunningFor": "Running since: {days}d {hours}h {minutes}min {seconds}s",
+  "@counterRunningFor": {
+    "description": "Shows how long something has been running",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsTitleGeneral": "General Settings",
+  "settingsRepoTitle": "Source Code (External)",
+  "settingsRepoSubtitle": "You can find the projects GitHub Repository here",
+  "settingsDarkmodeTitle": "Darkmode",
+  "settingsDarkmodeSubtitle": "When enabled the app uses darkmode",
+  "settingsConfirmationsForDeletion": "Confirmations for deletion",
+  "settingsConfirmationListDeletionTitle": "Confirm the deletion of lists",
+  "settingsConfirmationListDeletionSubtitle": "If disabled, you will no longer be asked to delete a list",
+  "settingsConfirmationListEntryDeletionTitle": "Confirm the deletion of list entries",
+  "settingsConfirmationListEntryDeletionSubtitle": "If disabled, you will no longer be asked to delete a list entry",
+  "settingsConfirmationCounterDeletionTitle": "Confirm the deletion of counters",
+  "settingsConfirmationCounterDeletionSubtitle": "If disabled, you will no longer be asked to delete a counter",
+  "listpageAddItem": "Add an item...",
+  "listpageEditItem": "Enter new text",
+  "dialogConfirmTitle": "Confirm",
+  "dialogConfirmSubtitle": "Are you sure you want to delete this?",
+  "dialogResetSubtitle": "Are you sure you want to reset this?",
+  "dialogOk": "OK",
+  "dialogCancel": "Cancel",
+  "dialogSTTTitle": "You may speak now",
+  "dialogSTTSubtitle": "You can use the word 'and' to separate your entries",
+  "dialogCounterChangeDateTime": "What time and date you want to change it?",
+  "dialogInvalidInput": "Invalid Input",
+  "launchUrlFailed": "Could not launch {finalUrl}",
+    "@launchUrlFailed": {
+    "description": "The Url which cannot be launched",
+    "placeholders": {
+      "finalUrl": {
+        "type": "String"
+      }
+    }
+  }
+}
