@@ -77,6 +77,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wenn aktiviert, benutzt die App das dunkle Design';
 
   @override
+  String get settingsDynamicThemeTitle => 'Dynamisches Design';
+
+  @override
+  String get settingsDynamicThemeSubtitle =>
+      'Wenn aktiviert, versucht es sich den Farben des Gerätes anzupassen';
+
+  @override
   String get settingsConfirmationsForDeletion => 'Bestätigungen fürs löschen';
 
   @override

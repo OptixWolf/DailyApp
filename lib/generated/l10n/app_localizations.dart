@@ -224,6 +224,18 @@ abstract class AppLocalizations {
   /// **'When enabled the app uses darkmode'**
   String get settingsDarkmodeSubtitle;
 
+  /// No description provided for @settingsDynamicThemeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dynamic Design'**
+  String get settingsDynamicThemeTitle;
+
+  /// No description provided for @settingsDynamicThemeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'When enabled the app tries to use the device theme colors'**
+  String get settingsDynamicThemeSubtitle;
+
   /// No description provided for @settingsConfirmationsForDeletion.
   ///
   /// In en, this message translates to:

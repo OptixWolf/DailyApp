@@ -38,6 +38,8 @@
   "settingsRepoSubtitle": "You can find the projects GitHub Repository here",
   "settingsDarkmodeTitle": "Darkmode",
   "settingsDarkmodeSubtitle": "When enabled the app uses darkmode",
+  "settingsDynamicThemeTitle": "Dynamic Design",
+  "settingsDynamicThemeSubtitle": "When enabled the app tries to use the device theme colors",
   "settingsConfirmationsForDeletion": "Confirmations for deletion",
   "settingsConfirmationListDeletionTitle": "Confirm the deletion of lists",
   "settingsConfirmationListDeletionSubtitle": "If disabled, you will no longer be asked to delete a list",

@@ -75,6 +75,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsDarkmodeSubtitle => 'When enabled the app uses darkmode';
 
   @override
+  String get settingsDynamicThemeTitle => 'Dynamic Design';
+
+  @override
+  String get settingsDynamicThemeSubtitle =>
+      'When enabled the app tries to use the device theme colors';
+
+  @override
   String get settingsConfirmationsForDeletion => 'Confirmations for deletion';
 
   @override

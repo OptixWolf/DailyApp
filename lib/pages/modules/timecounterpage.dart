@@ -37,13 +37,13 @@ class _TimeCounterPageState extends State<TimeCounterPage> {
         timeListen = timeList;
       });
     });
-        Preferences.getPrefBool('time-deletion').then((timeDeletionValue) {
+    Preferences.getPrefBool('time-deletion').then((timeDeletionValue) {
       setState(() {
         selectedAskTimeDeletionValue = timeDeletionValue;
       });
     });
 
-        now = DateTime.now();
+    now = DateTime.now();
 
     timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
       setState(() {
@@ -52,243 +52,255 @@ class _TimeCounterPageState extends State<TimeCounterPage> {
     });
   }
 
-    @override
-  Widget build(BuildContext context) {
-  final localizations = AppLocalizations.of(context)!;
-
-  void toggleSwitchReorder() {
-    setState(() {
-      selectedReorderValue = !selectedReorderValue;
-      Preferences.setPrefBool('reorder', selectedReorderValue);
-    });
+  @override
+  void dispose() {
+    timer.cancel(); // Stop the timer before the widget is destroyed
+    super.dispose();
   }
 
-        return Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(children: [
-              Row(
-                children: [
-                  const SizedBox(width: 7),
-                  Expanded(
-                      child:
-                          Text(localizations.categoryCounters, style: const TextStyle(fontSize: 50))),
-                  PopupMenuButton<int>(
-                    onSelected: (value) {
-                      if (value == 1) {
-                        toggleSwitchReorder();
-                      }
-                      if (value == 2) {
-                        _showDeleteDialog(context, -2, 'times');
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: 1,
-                        child: Row(
-                          children: [
-                            const Icon(Icons.menu),
-                            Text(localizations.generalSwitchIndicators),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 2,
-                        child: Row(
-                          children: [
-                            const Icon(Icons.delete),
-                            Text(localizations.generalDeleteAllEntries),
-                          ],
-                        ),
-                      ),
-                    ],
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
+    void toggleSwitchReorder() {
+      setState(() {
+        selectedReorderValue = !selectedReorderValue;
+        Preferences.setPrefBool('reorder', selectedReorderValue);
+      });
+    }
+
+    return Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(children: [
+          const SizedBox(height: 55),
+          Row(
+            children: [
+              const SizedBox(width: 7),
+              Expanded(
+                  child: Text(localizations.categoryCounters,
+                      style: const TextStyle(fontSize: 50))),
+              PopupMenuButton<int>(
+                onSelected: (value) {
+                  if (value == 1) {
+                    toggleSwitchReorder();
+                  }
+                  if (value == 2) {
+                    _showDeleteDialog(context, -2, 'times');
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 1,
+                    child: Row(
+                      children: [
+                        const Icon(Icons.menu),
+                        Text(localizations.generalSwitchIndicators),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 2,
+                    child: Row(
+                      children: [
+                        const Icon(Icons.delete),
+                        Text(localizations.generalDeleteAllEntries),
+                      ],
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 25),
-              timeListen.isNotEmpty
-                  ? Expanded(
-                      child: ReorderableListView.builder(
-                        itemCount: timeListen.length,
-                        itemBuilder: (context, index) {
-                          final thisDateTime = DateTime.parse(timeListen
-                              .elementAt(index)
-                              .substring(
-                                  0, timeListen.elementAt(index).indexOf('|')));
-                          final thisName = timeListen
-                              .elementAt(index)
-                              .replaceAll('$thisDateTime|', '');
-                          Duration thisDifference =
-                              now.difference(thisDateTime);
+            ],
+          ),
+          const SizedBox(height: 25),
+          timeListen.isNotEmpty
+              ? Expanded(
+                  child: ReorderableListView.builder(
+                    itemCount: timeListen.length,
+                    itemBuilder: (context, index) {
+                      final thisDateTime = DateTime.parse(timeListen
+                          .elementAt(index)
+                          .substring(
+                              0, timeListen.elementAt(index).indexOf('|')));
+                      final thisName = timeListen
+                          .elementAt(index)
+                          .replaceAll('$thisDateTime|', '');
+                      Duration thisDifference = now.difference(thisDateTime);
 
-                          return Card(
-                            key: Key('$index'),
-                            child: Slidable(
-                              key: Key('$index'),
-                              startActionPane: ActionPane(
-                                extentRatio: 0.8,
-                                motion: const BehindMotion(),
-                                children: [
-                                  SlidableAction(
-                                    onPressed: (context) {
-                                      setState(() {
-                                        editIndex2 = index;
-                                        textEditingController.text = thisName;
-                                      });
-                                    },
-                                    backgroundColor: Colors.blue,
-                                    icon: Icons.edit,
-                                    borderRadius: const BorderRadius.only(
-                                        topLeft: Radius.circular(10),
-                                        bottomLeft: Radius.circular(10)),
-                                  ),
-                                  SlidableAction(
-                                    onPressed: (context) {
-                                      _showDateTimeDialog(context, thisDateTime,
-                                          timeListen, index, 'times');
-                                    },
-                                    backgroundColor: Colors.green,
-                                    icon: Icons.timer,
-                                  ),
-                                  SlidableAction(
-                                    onPressed: (context) {
-                                      _showResetConfirmationDialog(
-                                          context, index, 'times', thisName);
-                                    },
-                                    backgroundColor: Colors.amber,
-                                    icon: Icons.restart_alt,
-                                  ),
-                                  SlidableAction(
-                                    onPressed: (context) {
-                                      _showDeleteDialog(
-                                          context, index, 'times');
-                                    },
-                                    backgroundColor: Colors.red,
-                                    icon: Icons.delete,
-                                  ),
-                                ],
+                      return Card(
+                        key: Key('$index'),
+                        child: Slidable(
+                          key: Key('$index'),
+                          startActionPane: ActionPane(
+                            extentRatio: 0.8,
+                            motion: const BehindMotion(),
+                            children: [
+                              SlidableAction(
+                                onPressed: (context) {
+                                  setState(() {
+                                    editIndex2 = index;
+                                    textEditingController.text = thisName;
+                                  });
+                                },
+                                backgroundColor: Colors.blue,
+                                icon: Icons.edit,
+                                borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(10),
+                                    bottomLeft: Radius.circular(10)),
                               ),
-                              child: ListTile(
-                                title: Text(thisName),
-                                subtitle: Text(localizations.counterRunningFor(thisDifference.inDays, thisDifference.inHours - (thisDifference.inDays * 24), thisDifference.inMinutes - (thisDifference.inHours * 60), thisDifference.inSeconds - (thisDifference.inMinutes * 60))),
-                                trailing: Visibility(
-                                  visible: selectedReorderValue,
-                                  child: ReorderableDragStartListener(
-                                      index: index,
-                                      child: const Icon(Icons.menu)),
-                                ),
+                              SlidableAction(
+                                onPressed: (context) {
+                                  _showDateTimeDialog(context, thisDateTime,
+                                      timeListen, index, 'times');
+                                },
+                                backgroundColor: Colors.green,
+                                icon: Icons.timer,
                               ),
+                              SlidableAction(
+                                onPressed: (context) {
+                                  _showResetConfirmationDialog(
+                                      context, index, 'times', thisName);
+                                },
+                                backgroundColor: Colors.amber,
+                                icon: Icons.restart_alt,
+                              ),
+                              SlidableAction(
+                                onPressed: (context) {
+                                  _showDeleteDialog(context, index, 'times');
+                                },
+                                backgroundColor: Colors.red,
+                                icon: Icons.delete,
+                              ),
+                            ],
+                          ),
+                          child: ListTile(
+                            title: Text(thisName),
+                            subtitle: Text(localizations.counterRunningFor(
+                                thisDifference.inDays,
+                                thisDifference.inHours -
+                                    (thisDifference.inDays * 24),
+                                thisDifference.inMinutes -
+                                    (thisDifference.inHours * 60),
+                                thisDifference.inSeconds -
+                                    (thisDifference.inMinutes * 60))),
+                            trailing: Visibility(
+                              visible: selectedReorderValue,
+                              child: ReorderableDragStartListener(
+                                  index: index, child: const Icon(Icons.menu)),
                             ),
-                          );
-                        },
-                        onReorder: (oldIndex, newIndex) {
+                          ),
+                        ),
+                      );
+                    },
+                    onReorderItem: (oldIndex, newIndex) {
+                      setState(() {
+                        if (oldIndex < newIndex) {
+                          newIndex -= 1;
+                        }
+                        final String item = timeListen.removeAt(oldIndex);
+                        timeListen.insert(newIndex, item);
+                        Preferences.setPrefList('times', timeListen);
+                      });
+                    },
+                  ),
+                )
+              : Expanded(
+                  child: Card(
+                    child: ListTile(
+                        title: Text(localizations.generalNoEntriesFound)),
+                  ),
+                ),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Row(
+                children: [
+                  Flexible(
+                      child: TextField(
+                    textInputAction: TextInputAction.go,
+                    onSubmitted: (value) {
+                      if (textEditingController.text.isNotEmpty) {
+                        if (editIndex2 == -1) {
                           setState(() {
-                            if (oldIndex < newIndex) {
-                              newIndex -= 1;
-                            }
-                            final String item = timeListen.removeAt(oldIndex);
-                            timeListen.insert(newIndex, item);
+                            timeListen.add(
+                                '${DateTime.now()}|${textEditingController.text}');
+                            textEditingController.text = '';
                             Preferences.setPrefList('times', timeListen);
                           });
-                        },
-                      ),
-                    )
-                  : Expanded(
-                      child: Card(
-                        child: ListTile(title: Text(localizations.generalNoEntriesFound)),
-                      ),
-                    ),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Row(
-                    children: [
-                      Flexible(
-                          child: TextField(
-                        textInputAction: TextInputAction.go,
-                        onSubmitted: (value) {
-                          if (textEditingController.text.isNotEmpty) {
-                            if (editIndex2 == -1) {
+                        } else {
+                          setState(() {
+                            timeListen[editIndex2] =
+                                '${timeListen.elementAt(editIndex2).substring(0, timeListen.elementAt(editIndex2).indexOf('|'))}|${textEditingController.text}';
+                            Preferences.setPrefList('times', timeListen);
+                            textEditingController.text = '';
+                            editIndex2 = -1;
+                          });
+                        }
+                      } else {
+                        Snackbar().show(
+                            context, localizations.generalFieldMustNotBeEmpty);
+                      }
+                    },
+                    controller: textEditingController,
+                    decoration: InputDecoration(
+                        hintText: editIndex2 == -1
+                            ? localizations.countersExampleName
+                            : localizations.countersEditFieldText),
+                  )),
+                  const SizedBox(width: 10),
+                  IconButton(
+                      icon: editIndex2 == -1
+                          ? const Icon(Icons.add)
+                          : const Icon(Icons.create),
+                      onPressed: () {
+                        if (textEditingController.text.isNotEmpty) {
+                          if (editIndex2 == -1) {
+                            setState(() {
+                              timeListen.add(
+                                  '${DateTime.now()}|${textEditingController.text}');
+                              textEditingController.text = '';
+                              Preferences.setPrefList('times', timeListen);
+                            });
+                          } else {
+                            setState(() {
+                              timeListen[editIndex2] =
+                                  '${timeListen.elementAt(editIndex2).substring(0, timeListen.elementAt(editIndex2).indexOf('|'))}|${textEditingController.text}';
+                              Preferences.setPrefList('times', timeListen);
+                              textEditingController.text = '';
+                              editIndex2 = -1;
+                            });
+                          }
+                        } else {
+                          Snackbar().show(context,
+                              localizations.generalFieldMustNotBeEmpty);
+                        }
+                      }),
+                  const SizedBox(width: 10),
+                  Visibility(
+                    visible: editIndex2 != -1,
+                    child: Row(
+                      children: [
+                        IconButton(
+                            icon: const Icon(Icons.cancel),
+                            onPressed: () {
                               setState(() {
-                                timeListen.add(
-                                    '${DateTime.now()}|${textEditingController.text}');
-                                textEditingController.text = '';
-                                Preferences.setPrefList('times', timeListen);
-                              });
-                            } else {
-                              setState(() {
-                                timeListen[editIndex2] =
-                                    '${timeListen.elementAt(editIndex2).substring(0, timeListen.elementAt(editIndex2).indexOf('|'))}|${textEditingController.text}';
-                                Preferences.setPrefList('times', timeListen);
                                 textEditingController.text = '';
                                 editIndex2 = -1;
                               });
-                            }
-                          } else {
-                            Snackbar()
-                                .show(context, localizations.generalFieldMustNotBeEmpty);
-                          }
-                        },
-                        controller: textEditingController,
-                        decoration: InputDecoration(
-                          hintText: editIndex2 == -1
-                              ? localizations.countersExampleName
-                              : localizations.countersEditFieldText
-                        ),
-                      )),
-                      const SizedBox(width: 10),
-                      IconButton(
-                          icon: editIndex2 == -1
-                              ? const Icon(Icons.add)
-                              : const Icon(Icons.create),
-                          onPressed: () {
-                            if (textEditingController.text.isNotEmpty) {
-                              if (editIndex2 == -1) {
-                                setState(() {
-                                  timeListen.add(
-                                      '${DateTime.now()}|${textEditingController.text}');
-                                  textEditingController.text = '';
-                                  Preferences.setPrefList('times', timeListen);
-                                });
-                              } else {
-                                setState(() {
-                                  timeListen[editIndex2] =
-                                      '${timeListen.elementAt(editIndex2).substring(0, timeListen.elementAt(editIndex2).indexOf('|'))}|${textEditingController.text}';
-                                  Preferences.setPrefList('times', timeListen);
-                                  textEditingController.text = '';
-                                  editIndex2 = -1;
-                                });
-                              }
-                            } else {
-                              Snackbar()
-                                  .show(context, localizations.generalFieldMustNotBeEmpty);
-                            }
-                          }),
-                      const SizedBox(width: 10),
-                      Visibility(
-                        visible: editIndex2 != -1,
-                        child: Row(
-                          children: [
-                            IconButton(
-                                icon: const Icon(Icons.cancel),
-                                onPressed: () {
-                                  setState(() {
-                                    textEditingController.text = '';
-                                    editIndex2 = -1;
-                                  });
-                                }),
-                            const SizedBox(width: 10),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              )
-            ]));
-}
+                            }),
+                        const SizedBox(width: 10),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          )
+        ]));
+  }
+
   Future<void> _showDeleteDialog(
       BuildContext context, int index, String key) async {
-      final localizations = AppLocalizations.of(context)!;
+    final localizations = AppLocalizations.of(context)!;
 
     if (key == 'times' && !selectedAskTimeDeletionValue) {
       deleteSpecificPrefData(context, index, key);
@@ -297,7 +309,8 @@ class _TimeCounterPageState extends State<TimeCounterPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text(localizations.dialogConfirmTitle, style: TextStyle(fontSize: 20)),
+            title: Text(localizations.dialogConfirmTitle,
+                style: TextStyle(fontSize: 20)),
             content: Text(localizations.dialogConfirmSubtitle),
             actions: <Widget>[
               TextButton(
@@ -320,7 +333,7 @@ class _TimeCounterPageState extends State<TimeCounterPage> {
     }
   }
 
-    void deleteSpecificPrefData(BuildContext context, int index, String key) {
+  void deleteSpecificPrefData(BuildContext context, int index, String key) {
     if (key == 'times') {
       if (index == -2) {
         setState(() {
@@ -338,9 +351,9 @@ class _TimeCounterPageState extends State<TimeCounterPage> {
     }
   }
 
-    Future<void> _showDateTimeDialog(BuildContext context, DateTime dateTime,
+  Future<void> _showDateTimeDialog(BuildContext context, DateTime dateTime,
       List<String> liste, int index, String key) async {
-        final localizations = AppLocalizations.of(context)!;
+    final localizations = AppLocalizations.of(context)!;
     TextEditingController textFieldController = TextEditingController(
         text: DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime));
 
@@ -387,14 +400,15 @@ class _TimeCounterPageState extends State<TimeCounterPage> {
     );
   }
 
-    Future<void> _showResetConfirmationDialog(
+  Future<void> _showResetConfirmationDialog(
       BuildContext context, int index, String key, String thisName) async {
-        final localizations = AppLocalizations.of(context)!;
+    final localizations = AppLocalizations.of(context)!;
     return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(localizations.dialogConfirmTitle, style: TextStyle(fontSize: 20)),
+          title: Text(localizations.dialogConfirmTitle,
+              style: TextStyle(fontSize: 20)),
           content: Text(localizations.dialogResetSubtitle),
           actions: <Widget>[
             TextButton(

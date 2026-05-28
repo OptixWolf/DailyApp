@@ -66,7 +66,8 @@ class _ListPageEntriesState extends State<ListPageEntries> {
           onResult: (result) {
             if (result.finalResult) {
               if (result.recognizedWords != "") {
-                List<String> newItems = result.recognizedWords.split(localizations.sTTSeperateWord);
+                List<String> newItems =
+                    result.recognizedWords.split(localizations.sTTSeperateWord);
 
                 for (int i = 0; i < newItems.length; i++) {
                   setState(() {
@@ -199,7 +200,7 @@ class _ListPageEntriesState extends State<ListPageEntries> {
                             ),
                           );
                         },
-                        onReorder: (oldIndex, newIndex) {
+                        onReorderItem: (oldIndex, newIndex) {
                           setState(() {
                             if (oldIndex < newIndex) {
                               newIndex -= 1;
@@ -246,16 +247,15 @@ class _ListPageEntriesState extends State<ListPageEntries> {
                               });
                             }
                           } else {
-                            Snackbar()
-                                .show(context, localizations.generalFieldMustNotBeEmpty);
+                            Snackbar().show(context,
+                                localizations.generalFieldMustNotBeEmpty);
                           }
                         },
                         controller: textEditingController,
                         decoration: InputDecoration(
-                          hintText: editIndex == -1
-                              ? localizations.listpageAddItem
-                              : localizations.listpageEditItem
-                        ),
+                            hintText: editIndex == -1
+                                ? localizations.listpageAddItem
+                                : localizations.listpageEditItem),
                       )),
                       const SizedBox(width: 10),
                       IconButton(
@@ -281,8 +281,8 @@ class _ListPageEntriesState extends State<ListPageEntries> {
                                 });
                               }
                             } else {
-                              Snackbar()
-                                  .show(context, localizations.generalFieldMustNotBeEmpty);
+                              Snackbar().show(context,
+                                  localizations.generalFieldMustNotBeEmpty);
                             }
                           }),
                       const SizedBox(width: 10),
@@ -328,7 +328,8 @@ class _ListPageEntriesState extends State<ListPageEntries> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text(localizations.dialogConfirmTitle, style: TextStyle(fontSize: 20)),
+            title: Text(localizations.dialogConfirmTitle,
+                style: TextStyle(fontSize: 20)),
             content: Text(localizations.dialogConfirmSubtitle),
             actions: <Widget>[
               TextButton(
@@ -374,8 +375,7 @@ class _ListPageEntriesState extends State<ListPageEntries> {
         return AlertDialog(
           title: Text(localizations.dialogSTTTitle,
               style: TextStyle(fontSize: 20)),
-          content:
-              Text(localizations.dialogSTTSubtitle),
+          content: Text(localizations.dialogSTTSubtitle),
           actions: <Widget>[
             TextButton(
               onPressed: () {

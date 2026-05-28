@@ -21,6 +21,8 @@
   "settingsRepoSubtitle": "Hier kommst du zum GitHub Repository vom Projekt",
   "settingsDarkmodeTitle": "Dunkler Modus",
   "settingsDarkmodeSubtitle": "Wenn aktiviert, benutzt die App das dunkle Design",
+  "settingsDynamicThemeTitle": "Dynamisches Design",
+  "settingsDynamicThemeSubtitle": "Wenn aktiviert, versucht es sich den Farben des Gerätes anzupassen",
   "settingsConfirmationsForDeletion": "Bestätigungen fürs löschen",
   "settingsConfirmationListDeletionTitle": "Bestätige das löschen von Listen",
   "settingsConfirmationListDeletionSubtitle": "Wenn deaktiviert, wirst du nicht mehr zum löschen einer Liste gefragt",

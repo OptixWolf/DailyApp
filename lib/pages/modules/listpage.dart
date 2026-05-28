@@ -24,7 +24,7 @@ class _ListPageState extends State<ListPage> {
   @override
   void initState() {
     super.initState();
-        Preferences.getPrefBool('reorder').then((reorderValue) {
+    Preferences.getPrefBool('reorder').then((reorderValue) {
       setState(() {
         selectedReorderValue = reorderValue;
       });
@@ -34,7 +34,7 @@ class _ListPageState extends State<ListPage> {
         listen = lists;
       });
     });
-        Preferences.getPrefBool('list-deletion').then((listDeletionValue) {
+    Preferences.getPrefBool('list-deletion').then((listDeletionValue) {
       setState(() {
         selectedAskListDeletionValue = listDeletionValue;
       });
@@ -43,261 +43,258 @@ class _ListPageState extends State<ListPage> {
 
   @override
   Widget build(BuildContext context) {
-  final localizations = AppLocalizations.of(context)!;
+    final localizations = AppLocalizations.of(context)!;
 
-  void toggleSwitchReorder() {
-    setState(() {
-      selectedReorderValue = !selectedReorderValue;
-      Preferences.setPrefBool('reorder', selectedReorderValue);
-    });
-  }
+    void toggleSwitchReorder() {
+      setState(() {
+        selectedReorderValue = !selectedReorderValue;
+        Preferences.setPrefBool('reorder', selectedReorderValue);
+      });
+    }
 
     return Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(children: [
-              Row(
-                children: [
-                  const SizedBox(width: 7),
-                  Expanded(
-                      child: Text(localizations.categoryLists, style: const TextStyle(fontSize: 50))),
-                  /*FilledButton(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(children: [
+          const SizedBox(height: 55),
+          Row(
+            children: [
+              const SizedBox(width: 7),
+              Expanded(
+                  child: Text(localizations.categoryLists,
+                      style: const TextStyle(fontSize: 50))),
+              /*FilledButton(
                       onPressed: () => {},
                       child: Text("Offline",
                           style: TextStyle(fontWeight: FontWeight.bold))),*/
-                  PopupMenuButton<int>(
-                    onSelected: (value) {
-                      if (value == 1) {
-                        toggleSwitchReorder();
-                      }
-                      if (value == 2) {
-                        _showDeleteDialog(context, -2, 'listen');
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: 1,
-                        child: Row(
-                          children: [
-                            const Icon(Icons.menu),
-                            Text(localizations.generalSwitchIndicators),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 2,
-                        child: Row(
-                          children: [
-                            const Icon(Icons.delete),
-                            Text(localizations.generalDeleteAllEntries),
-                          ],
-                        ),
-                      ),
-                    ],
+              PopupMenuButton<int>(
+                onSelected: (value) {
+                  if (value == 1) {
+                    toggleSwitchReorder();
+                  }
+                  if (value == 2) {
+                    _showDeleteDialog(context, -2, 'listen');
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 1,
+                    child: Row(
+                      children: [
+                        const Icon(Icons.menu),
+                        Text(localizations.generalSwitchIndicators),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 2,
+                    child: Row(
+                      children: [
+                        const Icon(Icons.delete),
+                        Text(localizations.generalDeleteAllEntries),
+                      ],
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 25),
-              listen.isNotEmpty
-                  ? Expanded(
-                      child: ReorderableListView.builder(
-                        itemCount: listen.length,
-                        itemBuilder: (context, index) {
-                          return Card(
-                            key: Key('$index'),
-                            child: Slidable(
-                              key: Key('$index'),
-                              startActionPane: ActionPane(
-                                extentRatio: 0.4,
-                                motion: const BehindMotion(),
-                                children: [
-                                  SlidableAction(
-                                    onPressed: (context) {
-                                      setState(() {
-                                        editIndex = index;
-                                        textEditingController.text =
-                                            listen.elementAt(index);
-                                      });
-                                    },
-                                    backgroundColor: Colors.blue,
-                                    icon: Icons.edit,
-                                    borderRadius: const BorderRadius.only(
-                                        topLeft: Radius.circular(10),
-                                        bottomLeft: Radius.circular(10)),
-                                  ),
-                                  SlidableAction(
-                                    onPressed: (context) {
-                                      _showDeleteDialog(
-                                          context, index, 'listen');
-                                    },
-                                    backgroundColor: Colors.red,
-                                    icon: Icons.delete,
-                                  ),
-                                ],
-                              ),
-                              child: ListTile(
-                                title: Text(
-                                  listen.elementAt(index),
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                                trailing: Visibility(
-                                  visible: selectedReorderValue,
-                                  child: ReorderableDragStartListener(
-                                      index: index,
-                                      child: const Icon(Icons.menu)),
-                                ),
-                                onTap: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => ListPageEntries(
-                                          listenname:
-                                              listen.elementAt(index))));
-                                },
-                              ),
-                            ),
-                          );
-                        },
-                        onReorder: (oldIndex, newIndex) {
-                          setState(() {
-                            if (oldIndex < newIndex) {
-                              newIndex -= 1;
-                            }
-                            final String item = listen.removeAt(oldIndex);
-                            listen.insert(newIndex, item);
-                            Preferences.setPrefList('listen', listen);
-                          });
-                        },
-                      ),
-                    )
-                  : Expanded(
-                      child: Card(
-                        child: ListTile(
-                          title: Text(localizations.listsNoListMessage),
-                        ),
-                      ),
-                    ),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Row(
-                    children: [
-                      Flexible(
-                          child: TextField(
-                        textInputAction: TextInputAction.go,
-                        onSubmitted: (value) {
-                          if (textEditingController.text.isNotEmpty) {
-                            if (editIndex == -1) {
-                              setState(() {
-                                if (!listen
-                                    .contains(textEditingController.text)) {
-                                  listen.add(textEditingController.text);
-                                  textEditingController.text = '';
-                                  Preferences.setPrefList('listen', listen);
-                                  Preferences.setPrefList(
-                                      'liste-${textEditingController.text}',
-                                      []);
-                                } else {
-                                  Snackbar().show(context, localizations.listsNameMustNotBeDuplicate);
-                                }
-                              });
-                            } else {
-                              setState(() {
-                                Preferences.getPrefList(
-                                        'liste-${listen.elementAt(editIndex)}')
-                                    .then((listContent) {
-                                  Preferences.remPref(
-                                      'liste-${listen.elementAt(editIndex)}');
-                                  listen[editIndex] =
-                                      textEditingController.text;
-                                  Preferences.setPrefList('listen', listen);
-                                  Preferences.setPrefList(
-                                      'liste-${listen.elementAt(editIndex)}',
-                                      listContent);
-                                  textEditingController.text = '';
-                                  editIndex = -1;
-                                });
-                              });
-                            }
-                          } else {
-                            Snackbar()
-                                .show(context, localizations.generalFieldMustNotBeEmpty);
-                          }
-                        },
-                        controller: textEditingController,
-                        decoration: InputDecoration(
-                          hintText: editIndex == -1
-                              ? localizations.listsExampleName
-                              : localizations.listsEditFieldText,
-                        ),
-                      )),
-                      const SizedBox(width: 10),
-                      IconButton(
-                          icon: editIndex == -1
-                              ? const Icon(Icons.add)
-                              : const Icon(Icons.create),
-                          onPressed: () {
-                            if (textEditingController.text.isNotEmpty) {
-                              if (editIndex == -1) {
-                                setState(() {
-                                  if (!listen
-                                      .contains(textEditingController.text)) {
-                                    listen.add(textEditingController.text);
-                                    textEditingController.text = '';
-                                    Preferences.setPrefList('listen', listen);
-                                    Preferences.setPrefList(
-                                        'liste-${textEditingController.text}',
-                                        []);
-                                  } else {
-                                    Snackbar().show(context, localizations.listsNameMustNotBeDuplicate);
-                                  }
-                                });
-                              } else {
-                                setState(() {
-                                  Preferences.getPrefList(
-                                          'liste-${listen.elementAt(editIndex)}')
-                                      .then((listContent) {
-                                    Preferences.remPref(
-                                        'liste-${listen.elementAt(editIndex)}');
-                                    listen[editIndex] =
-                                        textEditingController.text;
-                                    Preferences.setPrefList('listen', listen);
-                                    Preferences.setPrefList(
-                                        'liste-${listen.elementAt(editIndex)}',
-                                        listContent);
-                                    textEditingController.text = '';
-                                    editIndex = -1;
-                                  });
-                                });
-                              }
-                            } else {
-                              Snackbar()
-                                  .show(context, localizations.generalFieldMustNotBeEmpty);
-                            }
-                          }),
-                      const SizedBox(width: 10),
-                      Visibility(
-                        visible: editIndex != -1,
-                        child: Row(
-                          children: [
-                            IconButton(
-                                icon: const Icon(Icons.cancel),
-                                onPressed: () {
+            ],
+          ),
+          const SizedBox(height: 25),
+          listen.isNotEmpty
+              ? Expanded(
+                  child: ReorderableListView.builder(
+                    itemCount: listen.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        key: Key('$index'),
+                        child: Slidable(
+                          key: Key('$index'),
+                          startActionPane: ActionPane(
+                            extentRatio: 0.4,
+                            motion: const BehindMotion(),
+                            children: [
+                              SlidableAction(
+                                onPressed: (context) {
                                   setState(() {
-                                    textEditingController.text = '';
-                                    editIndex = -1;
+                                    editIndex = index;
+                                    textEditingController.text =
+                                        listen.elementAt(index);
                                   });
-                                }),
-                            const SizedBox(width: 10),
-                          ],
+                                },
+                                backgroundColor: Colors.blue,
+                                icon: Icons.edit,
+                                borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(10),
+                                    bottomLeft: Radius.circular(10)),
+                              ),
+                              SlidableAction(
+                                onPressed: (context) {
+                                  _showDeleteDialog(context, index, 'listen');
+                                },
+                                backgroundColor: Colors.red,
+                                icon: Icons.delete,
+                              ),
+                            ],
+                          ),
+                          child: ListTile(
+                            title: Text(
+                              listen.elementAt(index),
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                            trailing: Visibility(
+                              visible: selectedReorderValue,
+                              child: ReorderableDragStartListener(
+                                  index: index, child: const Icon(Icons.menu)),
+                            ),
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => ListPageEntries(
+                                      listenname: listen.elementAt(index))));
+                            },
+                          ),
                         ),
-                      )
-                    ],
+                      );
+                    },
+                    onReorderItem: (oldIndex, newIndex) {
+                      setState(() {
+                        if (oldIndex < newIndex) {
+                          newIndex -= 1;
+                        }
+                        final String item = listen.removeAt(oldIndex);
+                        listen.insert(newIndex, item);
+                        Preferences.setPrefList('listen', listen);
+                      });
+                    },
+                  ),
+                )
+              : Expanded(
+                  child: Card(
+                    child: ListTile(
+                      title: Text(localizations.listsNoListMessage),
+                    ),
                   ),
                 ),
-              )
-            ]));
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Row(
+                children: [
+                  Flexible(
+                      child: TextField(
+                    textInputAction: TextInputAction.go,
+                    onSubmitted: (value) {
+                      if (textEditingController.text.isNotEmpty) {
+                        if (editIndex == -1) {
+                          setState(() {
+                            if (!listen.contains(textEditingController.text)) {
+                              listen.add(textEditingController.text);
+                              textEditingController.text = '';
+                              Preferences.setPrefList('listen', listen);
+                              Preferences.setPrefList(
+                                  'liste-${textEditingController.text}', []);
+                            } else {
+                              Snackbar().show(context,
+                                  localizations.listsNameMustNotBeDuplicate);
+                            }
+                          });
+                        } else {
+                          setState(() {
+                            Preferences.getPrefList(
+                                    'liste-${listen.elementAt(editIndex)}')
+                                .then((listContent) {
+                              Preferences.remPref(
+                                  'liste-${listen.elementAt(editIndex)}');
+                              listen[editIndex] = textEditingController.text;
+                              Preferences.setPrefList('listen', listen);
+                              Preferences.setPrefList(
+                                  'liste-${listen.elementAt(editIndex)}',
+                                  listContent);
+                              textEditingController.text = '';
+                              editIndex = -1;
+                            });
+                          });
+                        }
+                      } else {
+                        Snackbar().show(
+                            context, localizations.generalFieldMustNotBeEmpty);
+                      }
+                    },
+                    controller: textEditingController,
+                    decoration: InputDecoration(
+                      hintText: editIndex == -1
+                          ? localizations.listsExampleName
+                          : localizations.listsEditFieldText,
+                    ),
+                  )),
+                  const SizedBox(width: 10),
+                  IconButton(
+                      icon: editIndex == -1
+                          ? const Icon(Icons.add)
+                          : const Icon(Icons.create),
+                      onPressed: () {
+                        if (textEditingController.text.isNotEmpty) {
+                          if (editIndex == -1) {
+                            setState(() {
+                              if (!listen
+                                  .contains(textEditingController.text)) {
+                                listen.add(textEditingController.text);
+                                textEditingController.text = '';
+                                Preferences.setPrefList('listen', listen);
+                                Preferences.setPrefList(
+                                    'liste-${textEditingController.text}', []);
+                              } else {
+                                Snackbar().show(context,
+                                    localizations.listsNameMustNotBeDuplicate);
+                              }
+                            });
+                          } else {
+                            setState(() {
+                              Preferences.getPrefList(
+                                      'liste-${listen.elementAt(editIndex)}')
+                                  .then((listContent) {
+                                Preferences.remPref(
+                                    'liste-${listen.elementAt(editIndex)}');
+                                listen[editIndex] = textEditingController.text;
+                                Preferences.setPrefList('listen', listen);
+                                Preferences.setPrefList(
+                                    'liste-${listen.elementAt(editIndex)}',
+                                    listContent);
+                                textEditingController.text = '';
+                                editIndex = -1;
+                              });
+                            });
+                          }
+                        } else {
+                          Snackbar().show(context,
+                              localizations.generalFieldMustNotBeEmpty);
+                        }
+                      }),
+                  const SizedBox(width: 10),
+                  Visibility(
+                    visible: editIndex != -1,
+                    child: Row(
+                      children: [
+                        IconButton(
+                            icon: const Icon(Icons.cancel),
+                            onPressed: () {
+                              setState(() {
+                                textEditingController.text = '';
+                                editIndex = -1;
+                              });
+                            }),
+                        const SizedBox(width: 10),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          )
+        ]));
   }
-    Future<void> _showDeleteDialog(
+
+  Future<void> _showDeleteDialog(
       BuildContext context, int index, String key) async {
-      final localizations = AppLocalizations.of(context)!;
+    final localizations = AppLocalizations.of(context)!;
 
     if (key == 'listen' && !selectedAskListDeletionValue) {
       deleteSpecificPrefData(context, index, key);
@@ -306,7 +303,8 @@ class _ListPageState extends State<ListPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text(localizations.dialogConfirmTitle, style: TextStyle(fontSize: 20)),
+            title: Text(localizations.dialogConfirmTitle,
+                style: TextStyle(fontSize: 20)),
             content: Text(localizations.dialogConfirmSubtitle),
             actions: <Widget>[
               TextButton(
@@ -329,7 +327,7 @@ class _ListPageState extends State<ListPage> {
     }
   }
 
-    void deleteSpecificPrefData(BuildContext context, int index, String key) {
+  void deleteSpecificPrefData(BuildContext context, int index, String key) {
     if (key == 'listen') {
       if (index == -2) {
         setState(() {
