@@ -36,8 +36,8 @@ jobs:
       - name: Build Android
         if: runner.os == 'Linux'
         run: |
-          flutter build apk --release
-          flutter build apk --release --split-per-abi
+          flutter build apk --release -- -Dorg.gradle.java.home=$JAVA_HOME
+          flutter build apk --release --split-per-abi -- -Dorg.gradle.java.home=$JAVA_HOME
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
