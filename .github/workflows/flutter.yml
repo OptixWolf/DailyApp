@@ -24,6 +24,9 @@ jobs:
           distribution: 'oracle'
           java-version: '17'
 
+      - name: Override gradle.properties Java home
+        run: sed -i "s|org.gradle.java.home=.*|org.gradle.java.home=$JAVA_HOME|" android/gradle.properties
+
       - name: Set Up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -36,8 +39,8 @@ jobs:
       - name: Build Android
         if: runner.os == 'Linux'
         run: |
-          flutter build apk --release -- -Dorg.gradle.java.home=$JAVA_HOME
-          flutter build apk --release --split-per-abi -- -Dorg.gradle.java.home=$JAVA_HOME
+          flutter build apk --release
+          flutter build apk --release --split-per-abi
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
